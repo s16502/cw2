@@ -15,6 +15,7 @@ namespace cwiczenia2.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
+        
         string conString = "Data Source=db-mssql;Initial Catalog=s16502; Integrated Security=True";
 
         public StudentsController()
@@ -50,19 +51,54 @@ namespace cwiczenia2.Controllers
             }
             return Ok(list);
         }
+       //4.3
 
-        [HttpGet("{id}")]
-        public IActionResult GetStudent([FromRoute]string indeks)
+       /* [HttpGet("{id}")]
+        public IActionResult GetStudent([FromRoute]string id)
         {
             var st = new StudentInfoDTO();
             using (SqlConnection con = new SqlConnection(conString))
             using (SqlCommand com = new SqlCommand())
             {
                 com.Connection = con;
-                com.CommandText = "select s.FirstName, s.LastName, s.BirthDate, st.Name, e.Semester from Student s join Enrollment e on e.IdEnrollment = s.IdEnrollment join Studies st on st.IdStudy = e.IdStudy";
+                com.CommandText = "select s.FirstName, s.LastName, s.BirthDate, s.IndexNumber, st.Name, e.Semester from Student s " +
+                    "join Enrollment e on e.IdEnrollment = s.IdEnrollment join Studies st on st.IdStudy = e.IdStudy " +
+                    $"where s.IndexNumber = '{id}'";
                 con.Open();
 
                 SqlDataReader dr = com.ExecuteReader();
+                dr.Read();
+
+                st.FirstName = dr["FirstName"].ToString();
+                st.LastName = dr["LastName"].ToString();
+                st.BirthDate = dr["BirthDate"].ToString();
+                st.Name = dr["Name"].ToString();
+                st.Semester = dr["Semester"].ToString();
+            }
+            return Ok(st);
+        } */
+
+        /* 4.4 
+         * https://localhost:44308/api/students/aa';DROP TABLE Student;--
+         */
+
+        // 4.5
+        [HttpGet("{id}")]
+        public IActionResult GetStudent([FromRoute]string id)
+        {
+            var st = new StudentInfoDTO();
+            using (SqlConnection con = new SqlConnection(conString))
+            using (SqlCommand com = new SqlCommand())
+            {
+                com.Connection = con;
+                com.CommandText = "select s.FirstName, s.LastName, s.BirthDate, s.IndexNumber, st.Name, e.Semester from Student s " +
+                    "join Enrollment e on e.IdEnrollment = s.IdEnrollment join Studies st on st.IdStudy = e.IdStudy " +
+                    $"where s.IndexNumber = @id";
+                com.Parameters.AddWithValue("id", id);
+                con.Open();
+
+                SqlDataReader dr = com.ExecuteReader();
+                dr.Read();
 
                 st.FirstName = dr["FirstName"].ToString();
                 st.LastName = dr["LastName"].ToString();
